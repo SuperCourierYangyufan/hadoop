@@ -9,10 +9,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Job.JobState;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.springframework.stereotype.Service;
 
 /**
  @author 杨宇帆
@@ -42,10 +40,10 @@ public class WordCountDriver{
         job.setOutputValueClass(IntWritable.class);
         //6.设置输入和输出路径
         if(StringUtils.isEmpty(input)){
-            input = "C:\\Users\\Administrator\\Desktop\\word.txt";
+            input = "C:\\Users\\yangyufan\\Desktop\\word.txt";
         }
         if(StringUtils.isEmpty(output)){
-            output = "C:\\Users\\Administrator\\Desktop\\wordOut.txt";
+            output = "C:\\Users\\yangyufan\\Desktop\\wordOut.txt";
         }
         FileInputFormat.setInputPaths(job,new Path(input));
         FileOutputFormat.setOutputPath(job,new Path(output));
@@ -56,6 +54,6 @@ public class WordCountDriver{
     }
 
     public static void main(String[] args) throws Exception{
-        startDriver(args[0],args[1]);
+        startDriver(null,null);
     }
 }
