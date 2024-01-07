@@ -3,12 +3,14 @@ package com.my.hadoop.driver;
 import com.my.hadoop.HadoopApplication;
 import com.my.hadoop.mapper.FlowMapper;
 import com.my.hadoop.mapper.WordCountMapper;
+import com.my.hadoop.partition.FlowPartitioner;
 import com.my.hadoop.reducer.FlowReducer;
 import com.my.hadoop.reducer.WordCountReducer;
 import com.my.hadoop.writable.FlowBean;
 import java.io.File;
 import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileUtil;
@@ -17,6 +19,8 @@ import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.CombineFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -46,11 +50,27 @@ public class FlowDriver {
         job.setOutputValueClass(FlowBean.class);
         //6.设置输入和输出路径
         if(StringUtils.isEmpty(input)){
-            input = "E:\\code\\hadoop\\src\\main\\resources\\data\\phone_data.txt";
+            input = "E:\\code\\hadoop\\src\\main\\resources\\data\\inputflow\\phone_data.txt";
         }
         if(StringUtils.isEmpty(output)){
-            output = "C:\\Users\\Public\\Desktop\\wordOut1.txt";
+            output = "E:\\code\\hadoop\\src\\main\\resources\\out"+ RandomUtils.nextLong(10000L,99999L);
         }
+        /**
+         * -----------------如果不设置哦InputFormat,默认采用TextInputFormat----------------------
+         */
+        job.setInputFormatClass(CombineTextInputFormat.class);
+        /**
+         * 调整为4M 为一个map
+         */
+        CombineFileInputFormat.setMaxInputSplitSize(job,4 * 1024 * 1024);
+
+        /**
+         * 自定义分区和分区个数
+         */
+        job.setPartitionerClass(FlowPartitioner.class);
+        job.setNumReduceTasks(5);
+
+
         FileInputFormat.setInputPaths(job,input);
         FileOutputFormat.setOutputPath(job, new Path(output));
         //7.提交job
