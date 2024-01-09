@@ -6,6 +6,7 @@ import com.my.hadoop.output.WebOutPutFormat;
 import com.my.hadoop.reducer.TableJoinReducer;
 import com.my.hadoop.reducer.WebReducer;
 import com.my.hadoop.writable.TableJoinBean;
+import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,12 +44,19 @@ public class TableJoinDriver {
         job.setOutputValueClass(NullWritable.class);
         //6.设置输入和输出路径
         if(StringUtils.isEmpty(input)){
-            input = "E:\\code\\hadoop\\src\\main\\resources\\data\\inputtable";
+            input = "E:\\code\\hadoop\\src\\main\\resources\\data\\inputtable\\order.txt";
         }
         if(StringUtils.isEmpty(output)){
             output = "E:\\code\\hadoop\\src\\main\\resources\\out"+ RandomUtils.nextLong(10000L, 99999L);
         }
-
+        /**
+         * 加载缓存
+         */
+        job.addCacheFile(new URI("file:///E:/code/hadoop/src/main/resources/data/inputtable/pd.txt"));
+        /**
+         * 取消Reduce
+         */
+        job.setNumReduceTasks(0);
         FileInputFormat.setInputPaths(job, input);
         FileOutputFormat.setOutputPath(job, new Path(output));
         //7.提交job
